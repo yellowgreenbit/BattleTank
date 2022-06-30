@@ -15,6 +15,8 @@ class BATTLETANK_API ATankController : public APlayerController
 	GENERATED_BODY()
 	
 public:
+	ATankController();
+
 	virtual void SetupInputComponent() override;
 
 	virtual void SetPawn(class APawn* InPawn) override;
@@ -22,10 +24,26 @@ public:
 	UPROPERTY()
 		class ATankPawn* TankPawn;
 
+	UPROPERTY()
+		FVector MousePos;
+
+	virtual void Tick(float DeltaSeconds) override;
+
+	FVector GetMousePosition() { return MousePos; }
+
 protected:
 	UFUNCTION()
 		void MoveForward(float Value);
 
 	UFUNCTION()
 		void MoveRight(float Value);
+
+	UFUNCTION()
+		void RotateRight(float Value);
+
+	UFUNCTION()
+		void Fire();
+
+	UFUNCTION()
+		void FireSpecial();
 };
