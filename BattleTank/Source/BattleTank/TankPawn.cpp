@@ -98,10 +98,10 @@ void ATankPawn::BeginPlay()
 
 	TankController = Cast<ATankController>(GetController());
 
-	SetupCannon(CannonClass);
+	SetupCannon(CannonClass, 0);
 }
 
-void ATankPawn::SetupCannon(TSubclassOf<ACannon> NewCannonClass)
+void ATankPawn::SetupCannon(TSubclassOf<ACannon> NewCannonClass, int CountAmmo)
 {
 	if (!NewCannonClass) {
 		return;
@@ -127,14 +127,18 @@ void ATankPawn::SetupCannon(TSubclassOf<ACannon> NewCannonClass)
 		Cannon->AttachToComponent(CannonSetupPoint, FAttachmentTransformRules::SnapToTargetIncludingScale);
 		
 		if (!bCannonExists)
+		{
 			CannonClasses.Add(*CannonClass);
-		else
-			Cannon->AddAmmo(10);
+		}
+		else if (CountAmmo) {
+			Cannon->AddAmmo(CountAmmo);
+		}
+			
 	}
 	else {
 		// иначе просто добавляем патроны
-		if (Cannon) {
-			Cannon->AddAmmo(10);
+		if (Cannon && CountAmmo) {
+			Cannon->AddAmmo(CountAmmo);
 		}
 	}
 }
@@ -146,10 +150,10 @@ void ATankPawn::ChangeCannonType()
 		int CurrentIndexCannon = CannonClasses.Find(CannonClass);
 
 		if (CurrentIndexCannon == -1 || (CurrentIndexCannon == CannonClasses.Num() - 1)) {
-			SetupCannon(CannonClasses[0]);
+			SetupCannon(CannonClasses[0], 0);
 		}
 		else {
-			SetupCannon(CannonClasses[CurrentIndexCannon + 1]);
+			SetupCannon(CannonClasses[CurrentIndexCannon + 1], 0);
 		}
 	}
 }

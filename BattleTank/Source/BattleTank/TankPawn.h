@@ -23,7 +23,7 @@ public:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void RotateRight(float Value);
-	void SetupCannon(TSubclassOf<ACannon> NewCannonClass);
+	void SetupCannon(TSubclassOf<ACannon> NewCannonClass, int CountAmmo);
 	void ChangeCannonType();
 
 	virtual void Tick(float DeltaSeconds) override;
