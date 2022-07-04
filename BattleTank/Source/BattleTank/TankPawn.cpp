@@ -7,6 +7,7 @@
 #include "Camera\CameraComponent.h"
 #include "TankController.h"
 #include "Cannon.h"
+#include "Components/ArrowComponent.h"
 #include <Runtime/Engine/Classes/Kismet/KismetMathLibrary.h>
 
 // Sets default values
@@ -19,6 +20,9 @@ ATankPawn::ATankPawn()
 
 	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TurretMesh"));
 	TurretMesh->SetupAttachment(BodyMesh);
+
+	CannonSetupPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("ProjectileSpawnPoint"));
+	CannonSetupPoint->SetupAttachment(TurretMesh);
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(BodyMesh);
@@ -62,12 +66,7 @@ void ATankPawn::Tick(float DeltaSeconds)
 	// Tank rotation
 	CurrentRotateAxisValue = FMath::Lerp(CurrentRotateAxisValue, RotateRightAxisValue, InterpolationKey);
 	float YawRotation = RotationSpeed * CurrentRotateAxisValue * DeltaSeconds;
-	/*
-	UE_LOG(LogTemp, Warning,
-		TEXT("CurrentRotateAxis Value: %f, RotateRightAxisValue: %f"), 
-		CurrentRotateAxisValue, RotateRightAxisValue
-	);
-	*/
+
 	FRotator CurrentRotation = GetActorRotation();
 
 	YawRotation += CurrentRotation.Yaw;
@@ -95,30 +94,64 @@ void ATankPawn::BeginPlay()
 
 	FVector TankLocation = GetActorLocation();
 	
-	SetActorLocation(FVector(TankLocation.X, TankLocation.Y, 5.0f));
+	SetActorLocation(FVector(TankLocation.X, TankLocation.Y, 50.0f));
 
 	TankController = Cast<ATankController>(GetController());
 
-	SetupCannon();
+	SetupCannon(CannonClass);
 }
 
-void ATankPawn::SetupCannon()
+void ATankPawn::SetupCannon(TSubclassOf<ACannon> NewCannonClass)
 {
-	if (!CannonClass) {
+	if (!NewCannonClass) {
 		return;
 	}
 
-	if (Cannon) {
-		Cannon->Destroy();
+	bool bCannonExists = CannonClasses.Find(NewCannonClass) != -1;
+
+	// при инициализации или
+	// если пушка новая - добавляем ее переключаемся 
+	// если пушка не текущая - удаляем старую 
+	if (!bCannonExists || CannonClass != NewCannonClass || !Cannon) {
+		if (Cannon) {
+			Cannon->Destroy();
+		}
+
+		FActorSpawnParameters params;
+		params.Instigator = this;
+		params.Owner = this;
+
+		CannonClass = NewCannonClass;
+
+		Cannon = GetWorld()->SpawnActor<ACannon>(NewCannonClass, params);
+		Cannon->AttachToComponent(CannonSetupPoint, FAttachmentTransformRules::SnapToTargetIncludingScale);
+		
+		if (!bCannonExists)
+			CannonClasses.Add(*CannonClass);
+		else
+			Cannon->AddAmmo(10);
 	}
+	else {
+		// иначе просто добавляем патроны
+		if (Cannon) {
+			Cannon->AddAmmo(10);
+		}
+	}
+}
 
-	FActorSpawnParameters params;
-	params.Instigator = this;
-	params.Owner = this;
+void ATankPawn::ChangeCannonType()
+{
+	if (Cannon)
+	{
+		int CurrentIndexCannon = CannonClasses.Find(CannonClass);
 
-	Cannon = GetWorld()->SpawnActor<ACannon>(CannonClass, params);
-
-	Cannon->AttachToComponent(TurretMesh, FAttachmentTransformRules::SnapToTargetIncludingScale);
+		if (CurrentIndexCannon == -1 || (CurrentIndexCannon == CannonClasses.Num() - 1)) {
+			SetupCannon(CannonClasses[0]);
+		}
+		else {
+			SetupCannon(CannonClasses[CurrentIndexCannon + 1]);
+		}
+	}
 }
 
 void ATankPawn::Fire()

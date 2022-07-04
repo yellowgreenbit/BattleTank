@@ -46,4 +46,7 @@ protected:
 
 	UFUNCTION()
 		void FireSpecial();
+
+	UFUNCTION()
+		void ChangeCannonType();
 };

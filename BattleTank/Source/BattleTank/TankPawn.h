@@ -5,6 +5,7 @@
 #include "Cannon.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Components/ArrowComponent.h"
 #include "TankPawn.generated.h"
 
 class UStaticMeshComponent;
@@ -22,6 +23,8 @@ public:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void RotateRight(float Value);
+	void SetupCannon(TSubclassOf<ACannon> NewCannonClass);
+	void ChangeCannonType();
 
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
@@ -42,8 +45,14 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
 	class UCameraComponent* Camera;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Turret | Component")
+	class UArrowComponent* CannonSetupPoint;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret | Component")
 	TSubclassOf<ACannon> CannonClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret | Component")
+	TArray<TSubclassOf<ACannon>> CannonClasses;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Turret | Component")
 	ACannon* Cannon;
@@ -62,8 +71,6 @@ protected:
 
 	UPROPERTY()
 	class ATankController* TankController;
-
-	void SetupCannon();
 
 private:
 	float TargetYAxisValue = 0.f;
