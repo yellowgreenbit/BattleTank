@@ -8,21 +8,11 @@
 #include "TankController.h"
 #include "Cannon.h"
 #include "Components/ArrowComponent.h"
-#include <Runtime/Engine/Classes/Kismet/KismetMathLibrary.h>
+#include <Kismet/KismetMathLibrary.h>
 
-// Sets default values
 ATankPawn::ATankPawn()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	BodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyMesh"));
-	RootComponent = BodyMesh;
-
-	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TurretMesh"));
-	TurretMesh->SetupAttachment(BodyMesh);
-
-	CannonSetupPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("ProjectileSpawnPoint"));
-	CannonSetupPoint->SetupAttachment(TurretMesh);
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(BodyMesh);
@@ -61,8 +51,8 @@ void ATankPawn::Tick(float DeltaSeconds)
 	else {
 		MovePosition = CurrentLocation + GetActorRightVector() * MoveSpeed * TargetXAxisValue;
 	}
-
 	SetActorLocation(MovePosition, true);
+
 	// Tank rotation
 	CurrentRotateAxisValue = FMath::Lerp(CurrentRotateAxisValue, RotateRightAxisValue, InterpolationKey);
 	float YawRotation = RotationSpeed * CurrentRotateAxisValue * DeltaSeconds;
@@ -76,7 +66,6 @@ void ATankPawn::Tick(float DeltaSeconds)
 	SetActorRotation(newRotation);
 
 	// Turret rotation
-
 	FVector MousePos = TankController->GetMousePosition();
 
 	FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), MousePos);
@@ -110,8 +99,8 @@ void ATankPawn::SetupCannon(TSubclassOf<ACannon> NewCannonClass, int CountAmmo)
 	bool bCannonExists = CannonClasses.Find(NewCannonClass) != -1;
 
 	// при инициализации или
-	// если пушка новая - добавляем ее переключаемся 
-	// если пушка не текущая - удаляем старую 
+	// если пушка новая - добавляем ее переключаемся
+	// если пушка не текущая - удаляем старую
 	if (!bCannonExists || CannonClass != NewCannonClass || !Cannon) {
 		if (Cannon) {
 			Cannon->Destroy();

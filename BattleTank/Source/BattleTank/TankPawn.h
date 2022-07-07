@@ -6,18 +6,18 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Components/ArrowComponent.h"
+#include "MachinePawn.h"
 #include "TankPawn.generated.h"
 
 class UStaticMeshComponent;
 class ACannon;
 
 UCLASS()
-class BATTLETANK_API ATankPawn : public APawn
+class BATTLETANK_API ATankPawn : public AMachinePawn
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this pawn's properties
 	ATankPawn();
 
 	void MoveForward(float Value);
@@ -33,23 +33,12 @@ public:
 	void FireSpecial();
 
 protected:
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
-	UStaticMeshComponent* BodyMesh;
-
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
-	UStaticMeshComponent* TurretMesh;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
 	class USpringArmComponent* SpringArm;
 	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
 	class UCameraComponent* Camera;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Turret | Component")
-	class UArrowComponent* CannonSetupPoint;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret | Component")
-	TSubclassOf<ACannon> CannonClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret | Component")
 	TArray<TSubclassOf<ACannon>> CannonClasses;

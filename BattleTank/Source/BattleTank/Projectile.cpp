@@ -2,6 +2,7 @@
 
 
 #include "Projectile.h"
+#include "DamageTaker.h"
 #include "Components\SceneComponent.h"
 #include "Components\StaticMeshComponent.h"
 
@@ -36,6 +37,26 @@ void AProjectile::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor
 {
 	UE_LOG(LogTemp, Warning, TEXT("Projectile %s collided with %s. "), *GetName(), *OtherActor->GetName());
 
-	OtherActor->Destroy();
+	AActor* owner = GetOwner();
+	AActor* OwnerByOwner = owner != nullptr ? owner->GetOwner() : nullptr;
+
+	if (OtherActor != owner && OtherActor != OwnerByOwner)
+	{
+		IDamageTaker* DamageTakerActor = Cast<IDamageTaker>(OtherActor);
+
+		if (DamageTakerActor)
+		{
+			FDamageData DamageData;
+			DamageData.DamageValue = Damage;
+			DamageData.DamageInstigator = owner;
+			DamageData.DamageMaker = this;
+
+			DamageTakerActor->TakeDamage(DamageData);
+		}
+		else {
+			OtherActor->Destroy();
+		}
+	}
+	
 	Destroy();
 }

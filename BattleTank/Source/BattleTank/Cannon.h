@@ -15,6 +15,10 @@ class BATTLETANK_API ACannon : public AActor
 public:	
 	ACannon();
 	
+	bool IsReadyToFire() {
+		return bCanFire;
+	};
+
 	void Fire();
 	void FireSpecial();
 	void Reload();

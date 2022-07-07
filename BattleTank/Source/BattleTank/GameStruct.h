@@ -15,6 +15,22 @@ enum class ECannonType : uint8
 	FireMGun = 3 UMETA(DisplayName = "UseMGun")
 };
 
+USTRUCT()
+struct FDamageData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	float DamageValue;
+
+	UPROPERTY()
+	AActor* DamageInstigator;
+
+	UPROPERTY()
+	AActor* DamageMaker;
+
+};
+
 UCLASS()
 class BATTLETANK_API UGameStruct : public UObject
 {
