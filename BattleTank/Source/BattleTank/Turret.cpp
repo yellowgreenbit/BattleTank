@@ -48,7 +48,7 @@ void ATurret::Destroyed()
 
 void ATurret::Targeting()
 {
-	if (IsPlayerInrange()) {
+	if (IsPlayerInrange() && IsPlayerSeen()) {
 		RotateToPlayer();
 
 		if (CanFire() && Cannon && Cannon->IsReadyToFire()) {
@@ -104,4 +104,31 @@ void ATurret::SetupCannon()
 	params.Owner = this;
 	Cannon = GetWorld()->SpawnActor<ACannon>(CannonClass, params);
 	Cannon->AttachToComponent(CannonSetupPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+}
+
+bool ATurret::IsPlayerSeen()
+{
+	FVector PlayerPos = PlayerPawn->GetActorLocation();
+	FVector EyesPos = CannonSetupPoint->GetComponentLocation();
+
+	FHitResult HitResult;
+
+	FCollisionQueryParams TraceParams = FCollisionQueryParams(FName(TEXT("FireTrace")), true, this);
+	TraceParams.bTraceComplex = true;
+	TraceParams.AddIgnoredActor(this);
+	TraceParams.bReturnPhysicalMaterial = false;
+
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, EyesPos, PlayerPos, ECollisionChannel::ECC_Visibility, TraceParams))
+	{
+		if (HitResult.GetActor())
+		{
+			DrawDebugLine(GetWorld(), EyesPos, HitResult.Location, FColor::Cyan, false, 0.5f, 0, 10);
+
+			return HitResult.GetActor() == PlayerPawn;
+		}
+	}
+
+	DrawDebugLine(GetWorld(), EyesPos, HitResult.Location, FColor::Purple, false, 0.5f, 0, 10);
+
+	return false;
 }

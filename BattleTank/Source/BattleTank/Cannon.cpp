@@ -3,8 +3,11 @@
 
 #include "Cannon.h"
 #include "Projectile.h"
+#include "ProjectilePool.h"
 #include "DamageTaker.h"
 #include "Components\StaticMeshComponent.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "Components/AudioComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Components\ArrowComponent.h"
 
@@ -20,6 +23,11 @@ ACannon::ACannon()
 
 	ProjectileSpawnPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("ProjectileSpawnPoint"));
 	ProjectileSpawnPoint->SetupAttachment(CannonSceneComponent);
+
+	ShootEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ShootEffect"));
+	ShootEffect->SetupAttachment(ProjectileSpawnPoint);
+
+	ShootAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("ShootAudio"));
 }
 
 void ACannon::Fire()
@@ -35,6 +43,9 @@ void ACannon::Fire()
 	}
 
 	Ammo--;
+
+	ShootEffect->ActivateSystem();
+	ShootAudio->Play();
 
 	LaunchProjectile();
 
@@ -131,15 +142,22 @@ void ACannon::LaunchProjectile()
 	}
 	else {
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, FString::Printf(TEXT("Fire projectile. Count: %d"), Ammo));
-		AProjectile* projectile = GetWorld()->SpawnActor<AProjectile>
-			(
-				ProjectileClass,
-				ProjectileSpawnPoint->GetComponentLocation(),
-				ProjectileSpawnPoint->GetComponentRotation()
-				);
 
-		if (projectile) {
-			projectile->Start();
+		if (ProjectilePool)
+		{
+			ProjectilePool->GetProjectile(ProjectileSpawnPoint->GetComponentLocation(), ProjectileSpawnPoint->GetComponentRotation());
+		}
+		else {
+			AProjectile* projectile = GetWorld()->SpawnActor<AProjectile>
+				(
+					ProjectileClass,
+					ProjectileSpawnPoint->GetComponentLocation(),
+					ProjectileSpawnPoint->GetComponentRotation()
+					);
+
+			if (projectile) {
+				projectile->Start();
+			}
 		}
 	}
 }
@@ -153,4 +171,19 @@ void ACannon::AddAmmo(int Value)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, FString::Printf(TEXT("Add Ammo. ( +: %d )"), Value));
 	Ammo += Value;
+}
+
+void ACannon::CreateProjectilePool()
+{
+	if (ProjectilePoolClass)
+	{
+		ProjectilePool = GetWorld()->SpawnActor<AProjectilePool>(ProjectilePoolClass, ProjectileSpawnPoint->GetComponentLocation(), ProjectileSpawnPoint->GetComponentRotation());
+	}
+}
+
+void ACannon::BeginPlay()
+{
+	Super::BeginPlay();
+
+	CreateProjectilePool();
 }

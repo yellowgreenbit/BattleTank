@@ -32,6 +32,8 @@ protected:
 	void Fire();
 	void SetupCannon();
 
+	bool IsPlayerSeen();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	class UBoxComponent* BoxComponent;
 

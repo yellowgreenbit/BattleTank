@@ -3,6 +3,8 @@
 
 #include "MachinePawn.h"
 #include "Components/ArrowComponent.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "Components/AudioComponent.h"
 #include "DamageTaker.h"
 
 AMachinePawn::AMachinePawn()
@@ -21,6 +23,16 @@ AMachinePawn::AMachinePawn()
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 	HealthComponent->OnDie.AddUObject(this, &AMachinePawn::Die);
 	HealthComponent->OnHealthChanged.AddUObject(this, &AMachinePawn::DamageTaked);
+
+	Hit_Effect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("HitEffect"));
+	Hit_Effect->SetupAttachment(BodyMesh);
+
+	Hit_Audio = CreateDefaultSubobject<UAudioComponent>(TEXT("HitAudio"));
+
+	DieEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("DieEffect"));
+	DieEffect->SetupAttachment(BodyMesh);
+
+	DieAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("DieAudio"));
 }
 
 void AMachinePawn::TakeDamage(FDamageData DamageData)
@@ -30,8 +42,7 @@ void AMachinePawn::TakeDamage(FDamageData DamageData)
 
 void AMachinePawn::BeginPlay()
 {
-	Super::BeginPlay();
-	
+	Super::BeginPlay();	
 }
 
 
@@ -43,11 +54,23 @@ void AMachinePawn::Tick(float DeltaTime)
 
 void AMachinePawn::Die()
 {
+	if (DieEffect)
+		DieEffect->ActivateSystem();
+
+	if (DieAudio)
+		DieAudio->Play();
+
 	Destroy();
 }
 
 void AMachinePawn::DamageTaked(float DamageValue)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Turret %s take Damage: %f, Health: %f"), *GetName(), DamageValue, HealthComponent->GetHealth());
+	
+	if(Hit_Effect)
+		Hit_Effect->ActivateSystem();
+
+	if (Hit_Audio)
+		Hit_Audio->Play();
 }
 

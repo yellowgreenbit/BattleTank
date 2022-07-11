@@ -25,7 +25,7 @@ public:
 		class ATankPawn* TankPawn;
 
 	UPROPERTY()
-		FVector MousePos;
+	FVector MousePos = FVector::ZeroVector;
 
 	virtual void Tick(float DeltaSeconds) override;
 

@@ -32,6 +32,22 @@ public:
 	void Fire();
 	void FireSpecial();
 
+	// AI
+	UFUNCTION()
+	TArray<FVector> GetPatrollingPoints() { return PatrollingPoints; }
+
+	UFUNCTION()
+	float GetAccurency() { return MovementAccurency; }
+
+	UFUNCTION()
+		FVector GetTurretForwardVector();
+
+	UFUNCTION()
+		void RotateTurretTo(FVector TargetPosition);
+
+	FVector GetEyesPosition();
+
+
 protected:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
@@ -60,6 +76,15 @@ protected:
 
 	UPROPERTY()
 	class ATankController* TankController;
+
+	// AI
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI | Components", Meta = (MakeEditWidget = true))
+	TArray<FVector> PatrollingPoints;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI | Components")
+	float MovementAccurency = 30.f;
+
+
 
 private:
 	float TargetYAxisValue = 0.f;

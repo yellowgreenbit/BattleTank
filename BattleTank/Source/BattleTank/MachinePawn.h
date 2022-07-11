@@ -44,6 +44,20 @@ protected:
 	UFUNCTION()
 		void DamageTaked(float DamageValue);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+		class UParticleSystemComponent* Hit_Effect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+		class UAudioComponent* Hit_Audio;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+		class UAudioComponent* DieAudio;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+		class UParticleSystemComponent* DieEffect;
+
+
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 };

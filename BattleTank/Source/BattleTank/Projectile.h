@@ -14,6 +14,8 @@ class BATTLETANK_API AProjectile : public AActor
 public:
 	AProjectile();
 
+	bool bIsActivation = false;
+
 	void Start();
 
 protected:
@@ -33,7 +35,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components");
 	float Damage = 10.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components");
+	float DeactivateTime = 10.f;
+
 	FTimerHandle MoveTimer;
+	FTimerHandle DeactivateTimer;
+
+	void Deactivate();
 
 	void Move();
 

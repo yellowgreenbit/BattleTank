@@ -66,15 +66,10 @@ void ATankPawn::Tick(float DeltaSeconds)
 	SetActorRotation(newRotation);
 
 	// Turret rotation
-	FVector MousePos = TankController->GetMousePosition();
-
-	FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), MousePos);
-	FRotator TurretRotation = TurretMesh->GetComponentRotation();
-
-	TargetRotation.Pitch = TurretRotation.Pitch;
-	TargetRotation.Roll = TurretRotation.Roll;
-
-	TurretMesh->SetWorldRotation(FMath::Lerp(TurretRotation, TargetRotation, RotateInterpolationKey));
+	if (TankController) {
+		FVector MousePos = TankController->GetMousePosition();
+		RotateTurretTo(MousePos);
+	}
 }
 
 void ATankPawn::BeginPlay()
@@ -161,4 +156,25 @@ void ATankPawn::FireSpecial()
 	{
 		Cannon->FireSpecial();
 	}
+}
+
+FVector ATankPawn::GetTurretForwardVector()
+{
+	return TurretMesh->GetForwardVector();
+}
+
+void ATankPawn::RotateTurretTo(FVector TargetPosition)
+{
+	FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetPosition);
+	FRotator TurretRotation = TurretMesh->GetComponentRotation();
+
+	TargetRotation.Pitch = TurretRotation.Pitch;
+	TargetRotation.Roll = TurretRotation.Roll;
+
+	TurretMesh->SetWorldRotation(FMath::Lerp(TurretRotation, TargetRotation, RotateInterpolationKey));	
+}
+
+FVector ATankPawn::GetEyesPosition()
+{
+	return CannonSetupPoint->GetComponentLocation();
 }

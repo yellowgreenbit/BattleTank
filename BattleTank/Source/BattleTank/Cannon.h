@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameStruct.h"
 #include "GameFramework/Actor.h"
+#include "ProjectilePool.h"
+#include "GameFramework/ForceFeedbackEffect.h"
 #include "Cannon.generated.h"
 
 UCLASS()
@@ -23,6 +25,8 @@ public:
 	void FireSpecial();
 	void Reload();
 	void AddAmmo(int Value);
+
+	void CreateProjectilePool();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
@@ -57,6 +61,23 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	TSubclassOf<class AProjectile> ProjectileClass;
+
+	UPROPERTY()
+	AProjectilePool* ProjectilePool;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+		TSubclassOf<AProjectilePool> ProjectilePoolClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+		class UParticleSystemComponent* ShootEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+		class UAudioComponent* ShootAudio;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
+		UForceFeedbackEffect* ShootForceEffect;
+
+	virtual void BeginPlay() override;
 
 private:
 	void FireSpecialQueue();
