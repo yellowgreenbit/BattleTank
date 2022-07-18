@@ -16,7 +16,7 @@ public:
 
 	bool bIsActivation = false;
 
-	void Start();
+	virtual void Start();
 
 protected:
 	UFUNCTION()
@@ -38,11 +38,22 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components");
 	float DeactivateTime = 10.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components");
+	float PushForce = 3000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components");
+	bool bEnableVolumeExplode = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement Params")
+		float ExplodeRadius = 200.0f;
+
 	FTimerHandle MoveTimer;
 	FTimerHandle DeactivateTimer;
 
+	void AddSingleForce(AActor* OtherActor);
+	void AddComplexForce();
 	void Deactivate();
 
-	void Move();
+	virtual void Move();
 
 };

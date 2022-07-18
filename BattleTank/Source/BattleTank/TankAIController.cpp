@@ -155,7 +155,7 @@ void ATankAIController::Initialize()
 
 	for (FVector Point : Points)
 	{
-		PatrollingPath.Add(Point + PawnLocation);
+		PatrollingPath.Add(Point);
 	}
 
 	CurrentPatrollingIndex = 0;

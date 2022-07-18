@@ -27,6 +27,67 @@ void AProjectile::Start()
 	GetWorld()->GetTimerManager().SetTimer(DeactivateTimer, this, &AProjectile::Deactivate, DeactivateTime, false);
 }
 
+void AProjectile::AddSingleForce(AActor* OtherActor)
+{
+	UPrimitiveComponent* Mesh = Cast<UPrimitiveComponent>(OtherActor->GetRootComponent());
+
+	if (Mesh)
+	{
+		if (Mesh->IsSimulatingPhysics()) {
+			FVector ForceVector = OtherActor->GetActorLocation() - GetActorLocation();
+			ForceVector.Normalize();
+			
+			Mesh->AddForce(ForceVector * PushForce, NAME_None, true);
+		}
+	}
+}
+
+void AProjectile::AddComplexForce()
+{
+	FVector StartPos = GetActorLocation();
+	FVector EndPos = StartPos + FVector(0.1f);
+
+	FCollisionShape Shape = FCollisionShape::MakeSphere(ExplodeRadius);
+	FCollisionQueryParams Params = FCollisionQueryParams::DefaultQueryParam;
+
+	Params.AddIgnoredActor(this);
+	Params.bTraceComplex = true;
+	Params.TraceTag = "Explode Trace";
+
+	TArray<FHitResult> AttachHit;
+
+	FQuat Rotation = FQuat::Identity;
+
+	bool bSweepResult = GetWorld()->SweepMultiByChannel(AttachHit, StartPos, EndPos,
+		Rotation, ECollisionChannel::ECC_Visibility, Shape, Params);
+
+	DrawDebugSphere(GetWorld(), StartPos, ExplodeRadius, 5, FColor::Green, false, 2.0f);
+
+	if (bSweepResult)
+	{
+		for (FHitResult HitResult : AttachHit)
+		{
+			AActor* OtherActor = HitResult.GetActor();
+
+			if (!OtherActor)
+				continue;
+
+			UPrimitiveComponent* Mesh = Cast<UPrimitiveComponent>(OtherActor->GetRootComponent());
+
+			if (Mesh)
+			{
+				if (Mesh->IsSimulatingPhysics()) {
+					FVector ForceVector = OtherActor->GetActorLocation() - GetActorLocation();
+					ForceVector.Normalize();
+
+					Mesh->AddImpulse(ForceVector * PushForce, NAME_None, true);
+				}
+			}
+			
+		}
+	}
+}
+
 void AProjectile::Deactivate()
 {
 	bIsActivation = false;
@@ -63,7 +124,13 @@ void AProjectile::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor
 			DamageTakerActor->TakeDamage(DamageData);
 		}
 		else {
-			OtherActor->Destroy();
+			if (bEnableVolumeExplode) {
+				AddComplexForce();
+			}
+			else
+			{
+				AddSingleForce(OtherActor);
+			}
 		}
 	}
 	
