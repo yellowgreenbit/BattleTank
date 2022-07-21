@@ -3,6 +3,7 @@
 
 #include "TankController.h"
 #include "TankPawn.h"
+#include <Engine/EngineTypes.h>
 
 ATankController::ATankController()
 {
@@ -16,6 +17,7 @@ void ATankController::SetupInputComponent()
 	InputComponent->BindAxis("MoveForward", this, &ATankController::MoveForward);
 	InputComponent->BindAxis("MoveRight", this, &ATankController::MoveRight);
 	InputComponent->BindAxis("RotateRight", this, &ATankController::RotateRight);
+	InputComponent->BindAxis("AIM", this,  &ATankController::ShowTrajectory);
 	InputComponent->BindAction("Fire", EInputEvent::IE_Pressed, this,  &ATankController::Fire);
 	InputComponent->BindAction("FireSpecial", EInputEvent::IE_Pressed, this,  &ATankController::FireSpecial);
 	InputComponent->BindAction("ChangeCannonType", EInputEvent::IE_Pressed, this,  &ATankController::ChangeCannonType);
@@ -25,18 +27,17 @@ void ATankController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	
-	FVector MouseDirection;
-	DeprojectMousePositionToWorld(MousePos, MouseDirection);
-
 	if (TankPawn) {
+
 		FVector TankPosition = TankPawn->GetActorLocation();
-		MousePos.Z = TankPosition.Z;
+		FHitResult HitResult;
+		GetWorld()->GetFirstPlayerController()->GetHitResultUnderCursor(ECollisionChannel::ECC_EngineTraceChannel2, false, HitResult);
 
-		FVector dir = MousePos - TankPosition;
-		dir.Normalize();
-		MousePos = TankPosition + dir * 1000.f;
+		if (HitResult.GetActor())
+		{
+			MousePos = HitResult.Location;
+		}
 
-		//DrawDebugLine(GetWorld(), TankPosition, MousePos, FColor::Green, false, .5f, 0, 5);
 	}
 }
 
@@ -90,4 +91,13 @@ void ATankController::ChangeCannonType()
 	{
 		TankPawn->ChangeCannonType();
 	}
+}
+
+void ATankController::ShowTrajectory(float Value)
+{
+	if (TankPawn && Value) {
+		FVector ProjectileSpawnPoint = TankPawn->GetCannon()->GetProjectileSpawnPoint()->GetComponentLocation();
+		//FVector TankPosition = TankPawn->GetActorLocation();
+		DrawDebugLine(GetWorld(), ProjectileSpawnPoint, MousePos, FColor::Green, false, .2f, 0, 5);
+	};
 }

@@ -11,12 +11,13 @@
 APhysicsProjectile::APhysicsProjectile()
 {
 	PhysicsComponent = CreateDefaultSubobject<UPhysicsComponent>(TEXT("PhysicsComponent"));
+
 }
 
 void APhysicsProjectile::Start()
 {
 	MoveVector = GetActorForwardVector() * MoveSpeedPhysics;
-	CurrentTrajectory = PhysicsComponent->GenerateTrajectory(GetActorLocation(), MoveVector, MaxTimeSimulation, TimeStep, 0.f);
+	CurrentTrajectory = PhysicsComponent->GenerateTrajectory(GetActorLocation(), MoveVector, FVector::Zero(), MaxTimeSimulation, TimeStep, 0.f);
 
 	if (bShowTrajectory)
 	{

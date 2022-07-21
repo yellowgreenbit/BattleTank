@@ -121,7 +121,6 @@ void ATankPawn::SetupCannon(TSubclassOf<ACannon> NewCannonClass, int CountAmmo)
 			
 	}
 	else {
-		// иначе просто добавляем патроны
 		if (Cannon && CountAmmo) {
 			Cannon->AddAmmo(CountAmmo);
 		}
@@ -157,6 +156,15 @@ void ATankPawn::FireSpecial()
 	{
 		Cannon->FireSpecial();
 	}
+}
+
+ACannon* ATankPawn::GetCannon()
+{
+	if (Cannon)
+	{
+		return Cannon;
+	}
+	return nullptr;
 }
 
 TArray<FVector> ATankPawn::GetPatrollingPoints()

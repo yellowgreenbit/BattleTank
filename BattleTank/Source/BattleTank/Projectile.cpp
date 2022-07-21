@@ -37,7 +37,7 @@ void AProjectile::AddSingleForce(AActor* OtherActor)
 			FVector ForceVector = OtherActor->GetActorLocation() - GetActorLocation();
 			ForceVector.Normalize();
 			
-			Mesh->AddForce(ForceVector * PushForce, NAME_None, true);
+			Mesh->AddImpulse(ForceVector * PushForce, NAME_None, true);
 		}
 	}
 }

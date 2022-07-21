@@ -33,6 +33,8 @@ public:
 	void Fire();
 	void FireSpecial();
 
+	ACannon* GetCannon();
+
 	// AI
 	UFUNCTION()
 		TArray<FVector> GetPatrollingPoints();

@@ -49,4 +49,7 @@ protected:
 
 	UFUNCTION()
 		void ChangeCannonType();
+
+	UFUNCTION()
+		void ShowTrajectory(float Value);
 };

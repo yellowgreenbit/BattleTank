@@ -16,5 +16,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gravity params");
 	float Gravity = -9.8f;
 
-	TArray<FVector> GenerateTrajectory(FVector StartPos, FVector Velocity, float MaxTime, float TimeStep, float MinZValue = 0.f);
+	TArray<FVector> GenerateTrajectory(
+		FVector StartPos, 
+		FVector EndPos, 
+		FVector Velocity, 
+		float MaxTime, 
+		float TimeStep, 
+		float MinZValue = 0.f
+	);
 };

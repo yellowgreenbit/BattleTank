@@ -25,8 +25,8 @@ public:
 	void FireSpecial();
 	void Reload();
 	void AddAmmo(int Value);
-
 	void CreateProjectilePool();
+	class UArrowComponent* GetProjectileSpawnPoint();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")

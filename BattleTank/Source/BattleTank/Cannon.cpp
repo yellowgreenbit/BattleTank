@@ -181,6 +181,11 @@ void ACannon::CreateProjectilePool()
 	}
 }
 
+UArrowComponent* ACannon::GetProjectileSpawnPoint()
+{
+	return ProjectileSpawnPoint;
+}
+
 void ACannon::BeginPlay()
 {
 	Super::BeginPlay();

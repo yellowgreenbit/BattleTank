@@ -3,7 +3,7 @@
 
 #include "PhysicsComponent.h"
 
-TArray<FVector> UPhysicsComponent::GenerateTrajectory(FVector StartPos, FVector Velocity, float MaxTime, float TimeStep, float MinZValue /*= 0.f*/)
+TArray<FVector> UPhysicsComponent::GenerateTrajectory(FVector StartPos, FVector Velocity, FVector EndPos, float MaxTime, float TimeStep, float MinZValue /*= 0.f*/)
 {
 	TArray<FVector> Trajectory;
 
